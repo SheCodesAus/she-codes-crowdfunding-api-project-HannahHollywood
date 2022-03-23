@@ -3,6 +3,11 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 # Create your models here.
+# class Category (models.Model):
+#     name = models.CharField(max_length=64)
+#     models.SlugField()
+#     # Slug Field is used to refer something by name instead of number?
+
 class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -32,3 +37,4 @@ class Pledge(models.Model):
         on_delete=models.CASCADE,
         related_name='supporter_pledges'
     )
+    # categories = models.ManyToManyField(Category, blank=True)
