@@ -1,6 +1,6 @@
 from email.mime import image
 from rest_framework import serializers
-from .models import Project, Pledge
+from .models import Project, Pledge, Category
 
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -15,15 +15,16 @@ class PledgeSerializer(serializers.Serializer):
 
 class ProjectSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    title = serializers.CharField(max_length=200)
+    project_title = serializers.CharField(max_length=200)
     description = serializers.CharField(max_length=200)
-    goal = serializers.IntegerField()
-    image = serializers.URLField()
+    project_goal = serializers.IntegerField()
+    project_image = serializers.URLField()
     is_open = serializers.BooleanField()
     date_created = serializers.DateTimeField()
     # owner = serializers.CharField(max_length=200)
     owner = serializers.ReadOnlyField(source='owner.id')
     # pledges = PledgeSerializer(many=True, read_only=True)
+    # project_category = CategorySerializer(many=False, read_only=False)
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
@@ -41,3 +42,14 @@ class ProjectDetailSerializer(ProjectSerializer):
             instance.owner = validated_data.get('owner', instance.owner)
             instance.save()
             return instance
+
+
+class CategorySerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    category_name = serializers.CharField(max_length=200)
+
+    def create(self, validated_data):
+        return Category.objects.create(**validated_data)
+
+# # class CategoryDetailSerializer(CategorySerializer):
+# #     category = CategorySerializer(many=False, read_only=False)

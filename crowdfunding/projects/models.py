@@ -3,23 +3,24 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 # Create your models here.
-# class Category (models.Model):
-#     name = models.CharField(max_length=64)
-#     models.SlugField()
-#     # Slug Field is used to refer something by name instead of number?
-
 class Project(models.Model):
-    title = models.CharField(max_length=200)
+    project_title = models.CharField(max_length=200)
     description = models.TextField()
-    goal = models.IntegerField()
-    image = models.URLField()
+    project_image = models.URLField()
     is_open = models.BooleanField()
+    project_goal = models.IntegerField()
     date_created = models.DateTimeField()
     # owner = models.CharField(max_length=200)
     owner = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
         related_name='owner_projects'
+    )
+    category = models.ForeignKey(
+        'Category',
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name='project_id'
     )
 
 class Pledge(models.Model):
@@ -38,3 +39,6 @@ class Pledge(models.Model):
         related_name='supporter_pledges'
     )
     # categories = models.ManyToManyField(Category, blank=True)
+
+class Category(models.Model):
+    category_name = models.CharField(max_length=200)
