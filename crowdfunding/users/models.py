@@ -13,3 +13,4 @@ class Badge(models.Model):
     image = models.URLField()
     user = models.ManyToManyField(CustomUser, related_name="badges")
     description = models.TextField()
+    badge_type = models.CharField(max_length=50)

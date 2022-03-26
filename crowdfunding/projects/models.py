@@ -42,4 +42,4 @@ class Pledge(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
