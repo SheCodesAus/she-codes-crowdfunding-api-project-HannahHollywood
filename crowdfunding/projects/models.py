@@ -41,4 +41,5 @@ class Pledge(models.Model):
     # categories = models.ManyToManyField(Category, blank=True)
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
+    slug = models.SlugField()

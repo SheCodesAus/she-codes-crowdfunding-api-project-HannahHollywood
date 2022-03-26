@@ -1,4 +1,5 @@
 from email.mime import image
+from unicodedata import category
 from rest_framework import serializers
 from .models import Project, Pledge, Category
 
@@ -25,6 +26,7 @@ class ProjectSerializer(serializers.Serializer):
     owner = serializers.ReadOnlyField(source='owner.id')
     # pledges = PledgeSerializer(many=True, read_only=True)
     # project_category = CategorySerializer(many=False, read_only=False)
+    category = serializers.SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
 
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
@@ -33,10 +35,10 @@ class ProjectDetailSerializer(ProjectSerializer):
         pledges = PledgeSerializer(many=True, read_only=True)
 
         def update(self, instance, validated_data):
-            instance.title = validated_data.get('title', instance.title)
+            instance.project_title = validated_data.get('project_title', instance.project_title)
             instance.description = validated_data.get('description',instance.description)
-            instance.goal = validated_data.get('goal', instance.goal)
-            instance.image = validated_data.get('image', instance.image)
+            instance.project_goal = validated_data.get('project_goal', instance.project_goal)
+            instance.project_image = validated_data.get('project_image', instance.project_image)
             instance.is_open = validated_data.get('is_open',instance.is_open)
             instance.date_created = validated_data.get('date_created',instance.date_created)
             instance.owner = validated_data.get('owner', instance.owner)
@@ -46,7 +48,8 @@ class ProjectDetailSerializer(ProjectSerializer):
 
 class CategorySerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    category_name = serializers.CharField(max_length=200)
+    name = serializers.CharField(max_length=200)
+    slug = serializers.SlugField()
 
     def create(self, validated_data):
         return Category.objects.create(**validated_data)

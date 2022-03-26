@@ -2,10 +2,10 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
-from rest_framework import status, permissions
+from rest_framework import status, permissions, generics
 from .permissions import IsOwnerOrReadOnly
-from .models import Project, Pledge
-from .serializers import ProjectSerializer, PledgeSerializer, ProjectDetailSerializer
+from .models import Project, Pledge, Category
+from .serializers import CategorySerializer, ProjectSerializer, PledgeSerializer, ProjectDetailSerializer
 
 
 # Create your views here.
@@ -89,3 +89,7 @@ class ProjectDetail(APIView):
         if serializer.is_valid():
             serializer.save()
         # When you view a specific project there will now be a “put” option
+
+class CategoryList(generics.ListCreateAPIView):
+    serializer_class = CategorySerializer
+    queryset = Category.objects.all()
