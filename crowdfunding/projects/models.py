@@ -4,11 +4,11 @@ from django.db import models
 
 # Create your models here.
 class Project(models.Model):
-    project_title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200)
     description = models.TextField()
-    project_image = models.URLField()
+    image = models.URLField()
     is_open = models.BooleanField()
-    project_goal = models.IntegerField()
+    goal = models.IntegerField()
     date_created = models.DateTimeField()
     # owner = models.CharField(max_length=200)
     owner = models.ForeignKey(

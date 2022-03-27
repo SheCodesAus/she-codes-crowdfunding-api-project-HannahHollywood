@@ -1,6 +1,6 @@
 from pydoc import describe
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Profile
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
@@ -12,6 +12,17 @@ class CustomUserSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return CustomUser.objects.create(**validated_data)
+
+# User Profile Serializer
+class ProfileSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=200)
+    full_name = serializers.CharField(max_length=600)
+    avatar = serializers.URLField()
+    bio = serializers.CharField(max_length=600)
+    website = serializers.URLField()
+
+    def create(self, validated_data):
+        return Profile.objects.create(**validated_data)
 
 class BadgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()

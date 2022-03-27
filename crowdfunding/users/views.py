@@ -2,8 +2,8 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
-from .models import CustomUser
-from .serializers import CustomUserSerializer, RegisterSerializer
+from .models import CustomUser, Profile
+from .serializers import CustomUserSerializer, RegisterSerializer, ProfileSerializer
 
 # Create your views here.
 class CustomUserList(APIView):
@@ -31,6 +31,26 @@ class CustomUserDetail(APIView):
         user = self.get_object(pk)
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
+
+# User Profile View
+class ProfileDetail(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        # IsOwnerOrReadOnly
+    ]
+    
+    def get(self, request):
+        profile = Profile.objects.all()
+        serializer = ProfileSerializer(profile, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data)
+        return Response(serializer.errors,
+        status=status.HTTP_400_BAD_REQUEST)
 
 # "Creating user account view" == Register Account
 class RegisterView(generics.CreateAPIView):
