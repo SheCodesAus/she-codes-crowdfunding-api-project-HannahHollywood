@@ -38,7 +38,6 @@ class Pledge(models.Model):
         on_delete=models.CASCADE,
         related_name='supporter_pledges'
     )
-    # categories = models.ManyToManyField(Category, blank=True)
 
 class Category(models.Model):
     name = models.CharField(max_length=200)

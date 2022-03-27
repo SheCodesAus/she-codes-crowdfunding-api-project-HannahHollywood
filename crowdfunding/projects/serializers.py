@@ -14,6 +14,7 @@ class PledgeSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Pledge.objects.create(**validated_data)
 
+
 class ProjectSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     project_title = serializers.CharField(max_length=200)
@@ -25,7 +26,6 @@ class ProjectSerializer(serializers.Serializer):
     # owner = serializers.CharField(max_length=200)
     owner = serializers.ReadOnlyField(source='owner.id')
     # pledges = PledgeSerializer(many=True, read_only=True)
-    # project_category = CategorySerializer(many=False, read_only=False)
     category = serializers.SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
 
     def create(self, validated_data):
@@ -54,6 +54,3 @@ class CategorySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Category.objects.create(**validated_data)
-
-# # class CategoryDetailSerializer(CategorySerializer):
-# #     category = CategorySerializer(many=False, read_only=False)
