@@ -15,8 +15,8 @@ class Profile(models.Model):
     avatar = models.URLField()
     bio = models.CharField(max_length=600)
     website = models.URLField()
-    owner = models.ForeignKey(
-        get_user_model(),
+    user = models.ForeignKey(
+        'CustomUser',
         on_delete=models.CASCADE,
         related_name='profile'
     )

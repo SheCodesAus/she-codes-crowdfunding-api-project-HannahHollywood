@@ -3,9 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from .models import CustomUser, Profile
-from .serializers import CustomUserSerializer, RegisterSerializer, ProfileSerializer
+from .serializers import CustomUserSerializer, RegisterSerializer, ProfileSerializer, ProfileDetailSerializer
 
-# Create your views here.
+# View a list of ALL user profiles on the website
 class CustomUserList(APIView):
     def get(self, request):
         users = CustomUser.objects.all()
@@ -20,6 +20,7 @@ class CustomUserList(APIView):
         return Response(serializer.errors)
 
 
+# View each  seperately
 class CustomUserDetail(APIView):
     def get_object(self, pk):
         try:
@@ -32,25 +33,28 @@ class CustomUserDetail(APIView):
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
 
+
 # User Profile View
 class ProfileDetail(APIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
         # IsOwnerOrReadOnly
-    ]
+        ]
     
-    def get(self, request):
+    def get(self, request, pk):
         profile = Profile.objects.all()
-        serializer = ProfileSerializer(profile, many=True)
+        serializer = ProfileDetailSerializer(profile, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = ProfileSerializer(data=request.data)
+    def post(self, request, pk):
+        serializer = ProfileDetailSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data)
         return Response(serializer.errors,
         status=status.HTTP_400_BAD_REQUEST)
+
+
 
 # "Creating user account view" == Register Account
 class RegisterView(generics.CreateAPIView):

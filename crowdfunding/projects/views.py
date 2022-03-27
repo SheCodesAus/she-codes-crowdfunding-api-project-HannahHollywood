@@ -92,6 +92,7 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # When you view a specific project there will now be a “put” option to edit
 
+
 class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()

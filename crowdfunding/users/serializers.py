@@ -13,9 +13,10 @@ class CustomUserSerializer(serializers.Serializer):
     def create(self, validated_data):
         return CustomUser.objects.create(**validated_data)
 
+
+
 # User Profile Serializer
 class ProfileSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=200)
     full_name = serializers.CharField(max_length=600)
     avatar = serializers.URLField()
     bio = serializers.CharField(max_length=600)
@@ -23,6 +24,19 @@ class ProfileSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Profile.objects.create(**validated_data)
+
+
+class ProfileDetailSerializer(ProfileSerializer):
+        # pledges = ProfileSerializer(many=True, read_only=True)
+
+        def update(self, instance, validated_data):
+            instance.full_name = validated_data.get('full name',instance.full_name)
+            instance.avatar = validated_data.get('avatar', instance.avatar)
+            instance.bio = validated_data.get('bio', instance.bio)
+            instance.website = validated_data.get('website', instance.website)
+            instance.save()
+            return instance
+
 
 class BadgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
