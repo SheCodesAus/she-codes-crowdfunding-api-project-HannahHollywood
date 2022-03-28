@@ -30,17 +30,12 @@ class CustomUserDetailSerializer(CustomUserSerializer):
             return instance
 
 
-class BadgeSerializer(serializers.Serializer):
+class BadgeSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
-    image = serializers.URLField()
-    description = serializers.CharField(max_length=50)
-    badge_type = serializers.CharField(max_length=50)
-    badge_goal = serializers.IntegerField()
 
     class Meta:
         model = Badge
         fields = ['id', 'image', 'description', 'badge_type', 'badge_goal']
-
 
 # CREATE A USER ACCOUNT
 class RegisterSerializer(serializers.ModelSerializer):
@@ -74,7 +69,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name']
         )
 
-        
+
         user.set_password(validated_data['password'])
         user.save()
 
