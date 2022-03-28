@@ -2,8 +2,8 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
-from .models import CustomUser, Profile
-from .serializers import CustomUserSerializer, RegisterSerializer, ProfileSerializer, ProfileDetailSerializer
+from .models import CustomUser, Badge
+from .serializers import BadgeSerializer, CustomUserSerializer, RegisterSerializer, CustomUserDetailSerializer
 
 # View a list of ALL user profiles on the website
 class CustomUserList(APIView):
@@ -20,8 +20,13 @@ class CustomUserList(APIView):
         return Response(serializer.errors)
 
 
-# View each  seperately
+# User Profile View
 class CustomUserDetail(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        # IsOwnerOrReadOnly
+        ]
+
     def get_object(self, pk):
         try:
             return CustomUser.objects.get(pk=pk)
@@ -30,30 +35,21 @@ class CustomUserDetail(APIView):
 
     def get(self, request, pk):
         user = self.get_object(pk)
-        serializer = CustomUserSerializer(user)
+        serializer = CustomUserDetailSerializer(user)
         return Response(serializer.data)
 
-
-# User Profile View
-class ProfileDetail(APIView):
-    permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly,
-        # IsOwnerOrReadOnly
-        ]
-    
-    def get(self, request, pk):
-        profile = Profile.objects.all()
-        serializer = ProfileDetailSerializer(profile, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, pk):
-        serializer = ProfileDetailSerializer(data=request.data)
+    def put(self, request, pk):
+        user = self.get_object(pk)
+        data = request.data
+        serializer = CustomUserDetailSerializer(
+            instance=user,
+            data=data,
+            partial=True
+        )
         if serializer.is_valid():
-            serializer.save(user=request.user)
-            return Response(serializer.data)
-        return Response(serializer.errors,
-        status=status.HTTP_400_BAD_REQUEST)
-
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # "Creating user account view" == Register Account
@@ -61,3 +57,9 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny,]
     queryset = CustomUser.objects.all()
+
+
+# class BadgeView(generics.ListCreateAPIView):
+#     serializer_class = BadgeSerializer
+#     queryset = Badge.objects.all()
+#     permission_classes = []

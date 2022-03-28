@@ -1,6 +1,6 @@
 from pydoc import describe
 from rest_framework import serializers
-from .models import CustomUser, Profile
+from .models import Badge, CustomUser
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 
@@ -9,24 +9,16 @@ class CustomUserSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     username = serializers.CharField(max_length=200)
     email = serializers.CharField(max_length=200)
-
-    def create(self, validated_data):
-        return CustomUser.objects.create(**validated_data)
-
-
-
-# User Profile Serializer
-class ProfileSerializer(serializers.Serializer):
     full_name = serializers.CharField(max_length=600)
     avatar = serializers.URLField()
     bio = serializers.CharField(max_length=600)
     website = serializers.URLField()
 
     def create(self, validated_data):
-        return Profile.objects.create(**validated_data)
+        return CustomUser.objects.create(**validated_data)
 
 
-class ProfileDetailSerializer(ProfileSerializer):
+class CustomUserDetailSerializer(CustomUserSerializer):
         # pledges = ProfileSerializer(many=True, read_only=True)
 
         def update(self, instance, validated_data):
@@ -43,7 +35,11 @@ class BadgeSerializer(serializers.Serializer):
     image = serializers.URLField()
     description = serializers.CharField(max_length=50)
     badge_type = serializers.CharField(max_length=50)
-    user = serializers.IntegerField()
+    badge_goal = serializers.IntegerField()
+
+    class Meta:
+        model = Badge
+        fields = ['id', 'image', 'description', 'badge_type', 'badge_goal']
 
 
 # CREATE A USER ACCOUNT
