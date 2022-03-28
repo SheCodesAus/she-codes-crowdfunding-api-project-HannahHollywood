@@ -59,7 +59,7 @@ class RegisterView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
 
 
-# class BadgeView(generics.ListCreateAPIView):
-#     serializer_class = BadgeSerializer
-#     queryset = Badge.objects.all()
-#     permission_classes = []
+class BadgeView(generics.ListCreateAPIView):
+    serializer_class = BadgeSerializer
+    queryset = Badge.objects.all()
+    permission_classes = [permissions.IsAdminUser]
