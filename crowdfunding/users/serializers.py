@@ -27,7 +27,8 @@ class CustomUserSerializer(serializers.Serializer):
 
 class CustomUserDetailSerializer(CustomUserSerializer):
         def update(self, instance, validated_data):
-            instance.full_name = validated_data.get('full name',instance.full_name)
+            instance.username = validated_data.get('username',instance.username)
+            # instance.full_name = validated_data.get('full name',instance.full_name)
             instance.avatar = validated_data.get('avatar', instance.avatar)
             instance.bio = validated_data.get('bio', instance.bio)
             instance.website = validated_data.get('website', instance.website)
