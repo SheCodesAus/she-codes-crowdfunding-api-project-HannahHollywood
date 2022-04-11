@@ -5,10 +5,10 @@ from django.http import Http404
 from rest_framework import status, permissions, generics
 from .permissions import IsOwnerOrReadOnly
 from .models import Project, Pledge, Category
-from .serializers import CategorySerializer, ProjectSerializer, PledgeSerializer, ProjectDetailSerializer
+from .serializers import CategorySerializer, ProjectSerializer, ProjectDetailSerializer, PledgeSerializer, PledgeDetailSerializer
 
 
-# Create your views here.
+# A View to Display all Pledges
 class PledgeList(APIView):
     def get(self, request):
         pledges = Pledge.objects.all()
@@ -28,6 +28,33 @@ class PledgeList(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+# A View to Display Specific Pledges Made to Specific Projects
+class PledgeDetail(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly
+    ]
+
+    def get_object(self, pk):
+        try:
+            pledge = Pledge.objects.get(pk=pk)
+            self.check_object_permissions(self.request,pledge)
+            return pledge
+            
+        except Pledge.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        pledge = self.get_object(pk)
+        serializer = PledgeDetailSerializer(pledge)
+        return Response(serializer.data)
+
+    def delete(self, request, pk):
+        pledge = self.get_object(pk)
+        pledge.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class ProjectList(APIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
@@ -36,12 +63,15 @@ class ProjectList(APIView):
 
     def get(self, request):
         projects = Project.objects.all()
+
         is_open = request.query_params.get('is_open', None)
         if is_open:
             projects = projects.filter(is_open=is_open)
+
         order_by = request.query_params.get('order_by', None)
         if order_by:
             projects = projects.order_by(order_by)
+
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
@@ -92,6 +122,10 @@ class ProjectDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         # When you view a specific project there will now be a “put” option to edit
 
+    def delete(self, request, pk):
+        project = self.get_object(pk)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
