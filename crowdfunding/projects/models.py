@@ -2,7 +2,20 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-# The BIG One! Project Creation
+User = get_user_model()
+
+class BaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
+
+# Project Creation
 class Project(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -28,6 +41,10 @@ class Project(models.Model):
         # then check for badges
         self.owner.badge_check('owner_projects')
 
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
+
 # Allow People to Pledge to Projects
 class Pledge(models.Model):
     amount = models.IntegerField()
@@ -50,7 +67,18 @@ class Pledge(models.Model):
         # then check for badges
         self.supporter.badge_check('supporter_pledges')
 
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
+
 # Used to Create New Invention Categories
 class Category(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
+
+# Allow users to add Comments
+class Comment(BaseModel):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="comments")
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="comments")
+    body = models.TextField()
+    visible = models.BooleanField(default=True)

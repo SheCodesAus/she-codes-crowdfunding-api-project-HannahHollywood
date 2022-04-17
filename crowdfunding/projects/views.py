@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from django.http import Http404
 from rest_framework import status, permissions, generics
 from .permissions import IsOwnerOrReadOnly
-from .models import Project, Pledge, Category
-from .serializers import CategorySerializer, ProjectSerializer, ProjectDetailSerializer, PledgeSerializer, PledgeDetailSerializer
+from .models import Project, Pledge, Category, Comment
+from .serializers import CategorySerializer, ProjectSerializer, ProjectDetailSerializer, PledgeSerializer, PledgeDetailSerializer, CommentSerializer, ProjectCommentSerializer
 
 
 # A View to Display all Pledges
@@ -54,6 +54,9 @@ class PledgeDetail(APIView):
         pledge.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
 
 class ProjectList(APIView):
     permission_classes = [
@@ -127,6 +130,46 @@ class ProjectDetail(APIView):
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
+
 class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
+
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
+
+# Comment Section Views
+class CommentList(generics.ListCreateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    queryset = Comment.objects.filter(visible=True)
+    serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsOwnerOrReadOnly
+    ]
+    queryset = Comment.objects.filter(visible=True)
+    serializer_class = CommentSerializer
+
+class ProjectCommentList(generics.ListCreateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+    # queryset = Comment.objects.filter(visible=True)
+    serializer_class = ProjectCommentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, project_id=self.kwargs.get("pk"))
+
+    def get_queryset(self):
+        return Comment.objects.filter(project_id=self.kwargs.get("pk"))

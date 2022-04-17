@@ -1,16 +1,22 @@
 from email.mime import image
 from unicodedata import category
 from rest_framework import serializers
-from .models import Project, Pledge, Category
+from .models import Project, Pledge, Category, Comment
+from django.contrib.auth import get_user_model
 
+# Pledge Creation & Views
 class PledgeSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     amount = serializers.IntegerField()
     comment = serializers.CharField(max_length=200)
     anonymous = serializers.BooleanField()
-    supporter = serializers.CharField(max_length=200)
-    # supporter = serializers.ReadOnlyField(source='owner.id')
+    # supporter = serializers.CharField(max_length=200)
+    supporter = serializers.SlugRelatedField(
+        slug_field= 'username', 
+        queryset= get_user_model().objects.all()
+    )
     project_id = serializers.IntegerField()
+    supporter = serializers.ReadOnlyField(source='supporter.id')
 
     def create(self, validated_data):
         return Pledge.objects.create(**validated_data)
@@ -24,6 +30,11 @@ class PledgeDetailSerializer(PledgeSerializer):
             instance.save()
             return instance
 
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
+
+# Project Creation & Views
 class ProjectSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     title = serializers.CharField(max_length=200)
@@ -41,8 +52,36 @@ class ProjectSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
 
+# --------------------------------------
+
+# Comment Section Views
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field="username",
+        read_only="true",
+    )
+
+    class Meta:
+        model = Comment
+        # fields = []
+        exclude = ["visible"]
+
+class ProjectCommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field="username",
+        read_only="true",
+    )
+
+    class Meta:
+        model = Comment
+        # fields = []
+        exclude = ["visible", "project"]  
+
+# --------------------------------------
+
 class ProjectDetailSerializer(ProjectSerializer):
         pledges = PledgeSerializer(many=True, read_only=True)
+        comments = CommentSerializer(many=True, read_only=True)
 
         def update(self, instance, validated_data):
             instance.title = validated_data.get('title', instance.title)
@@ -51,11 +90,15 @@ class ProjectDetailSerializer(ProjectSerializer):
             instance.image = validated_data.get('image', instance.image)
             instance.is_open = validated_data.get('is_open',instance.is_open)
             instance.date_created = validated_data.get('date_created',instance.date_created)
+            # instance.closing_date = validated_data.get('closing_date', instance.closing_date)
             instance.category = validated_data.get('category',instance.category)
             instance.owner = validated_data.get('owner',instance.owner)
             instance.save()
             return instance
 
+# --------------------------------------
+# -----------------------------------------------------------------------------------------
+# --------------------------------------
 
 class CategorySerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
