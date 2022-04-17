@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
 from django.db import models
 
+# Badge Type Tuple
 BADGE_TYPES = (
     ('owner_projects', 'Project'),
     ('supporter_pledges', 'Pledge'),
