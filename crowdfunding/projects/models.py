@@ -23,7 +23,7 @@ class Project(models.Model):
     is_open = models.BooleanField()
     goal = models.IntegerField()
     date_created = models.DateTimeField()
-    closing_date = models.DateTimeField(null=True)
+    closing_date = models.DateTimeField()
     owner = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
