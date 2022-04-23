@@ -51,6 +51,11 @@ class CustomUserDetail(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, pk):
+        user = self.get_object(pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # "Creating user account view" == Register Account
 class RegisterView(generics.CreateAPIView):

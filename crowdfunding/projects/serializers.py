@@ -10,13 +10,12 @@ class PledgeSerializer(serializers.Serializer):
     amount = serializers.IntegerField()
     comment = serializers.CharField(max_length=200)
     anonymous = serializers.BooleanField()
-    # supporter = serializers.CharField(max_length=200)
-    # supporter = serializers.SlugRelatedField(
-    #     slug_field= 'username', 
-    #     queryset= get_user_model().objects.all()
-    # )
+    supporter = serializers.SlugRelatedField(
+        slug_field= 'username', 
+        queryset= get_user_model().objects.all()
+    )
     project_id = serializers.IntegerField()
-    supporter = serializers.ReadOnlyField(source='supporter.id')
+    # supporter = serializers.ReadOnlyField(source='supporter.id')
 
     def create(self, validated_data):
         return Pledge.objects.create(**validated_data)
@@ -43,8 +42,11 @@ class ProjectSerializer(serializers.Serializer):
     image = serializers.URLField()
     is_open = serializers.BooleanField()
     date_created = serializers.DateTimeField()
-    # owner = serializers.CharField(max_length=200)
-    owner = serializers.ReadOnlyField(source='owner.id')
+    # owner = serializers.ReadOnlyField(source='owner.id')
+    owner = serializers.SlugRelatedField(
+        slug_field= 'username', 
+        queryset= get_user_model().objects.all()
+    )
     pledges = PledgeSerializer(many=True, read_only=True)
     category = serializers.SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
     closing_date = serializers.DateTimeField()
