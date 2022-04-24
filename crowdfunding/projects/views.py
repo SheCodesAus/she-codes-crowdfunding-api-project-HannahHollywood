@@ -1,3 +1,5 @@
+from nis import cat
+from unicodedata import category
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -5,7 +7,7 @@ from django.http import Http404
 from rest_framework import status, permissions, generics
 from .permissions import IsOwnerOrReadOnly
 from .models import Project, Pledge, Category, Comment
-from .serializers import CategorySerializer, ProjectSerializer, ProjectDetailSerializer, PledgeSerializer, PledgeDetailSerializer, CommentSerializer, ProjectCommentSerializer
+from .serializers import CategorySerializer, CategoryDetailSerializer, ProjectSerializer, ProjectDetailSerializer, PledgeSerializer, PledgeDetailSerializer, CommentSerializer, ProjectCommentSerializer
 
 
 # A View to Display all Pledges
@@ -32,7 +34,7 @@ class PledgeList(APIView):
 class PledgeDetail(APIView):
     permission_classes = [
         permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly
+        # IsOwnerOrReadOnly
     ]
 
     def get_object(self, pk):
@@ -49,14 +51,26 @@ class PledgeDetail(APIView):
         serializer = PledgeDetailSerializer(pledge)
         return Response(serializer.data)
 
+    def put(self, request, pk):
+        pledge = self.get_object(pk)
+        data = request.data
+        serializer = PledgeDetailSerializer(
+            instance=pledge,
+            data=data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     def delete(self, request, pk):
         pledge = self.get_object(pk)
         pledge.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# --------------------------------------
-# -----------------------------------------------------------------------------------------
-# --------------------------------------
+# /* --------------------------------------------------------- */
+# /* --------------------------------------------------------- */
 
 class ProjectList(APIView):
     permission_classes = [
@@ -130,17 +144,53 @@ class ProjectDetail(APIView):
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# --------------------------------------
-# -----------------------------------------------------------------------------------------
-# --------------------------------------
+# /* --------------------------------------------------------- */
+# /* --------------------------------------------------------- */
 
 class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
-# --------------------------------------
-# -----------------------------------------------------------------------------------------
-# --------------------------------------
+class CategoryDetail(APIView):
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        # IsOwnerOrReadOnly
+    ]
+
+    def get_object(self, pk):
+        try:
+            category = Category.objects.get(pk=pk)
+            self.check_object_permissions(self.request,category)
+            return category
+            
+        except Category.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        category = self.get_object(pk)
+        serializer = CategoryDetailSerializer(category)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        category = self.get_object(pk)
+        data = request.data
+        serializer = CategoryDetailSerializer(
+            instance=category,
+            data=data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        category = self.get_object(pk)
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# /* --------------------------------------------------------- */
+# /* --------------------------------------------------------- */
 
 # Comment Section Views
 class CommentList(generics.ListCreateAPIView):

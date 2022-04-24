@@ -11,10 +11,22 @@ class BadgeSerializer(serializers.ModelSerializer):
         model = Badge
         fields = ['id', 'image', 'description', 'badge_type', 'badge_goal']
 
+class BadgeDetailSerializer(BadgeSerializer):
+        def update(self, instance, validated_data):
+            instance.image = validated_data.get('image',instance.image)
+            instance.description = validated_data.get('description',instance.description)
+            instance.badge_type = validated_data.get('badge_type',instance.badge_type)
+            instance.badge_goal = validated_data.get('badge_goal',instance.badge_goal)
+            instance.save()
+            return instance
+
+# /* --------------------------------------------------------- */
+# /* --------------------------------------------------------- */
 
 class CustomUserSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     username = serializers.CharField(max_length=200)
+    # full_name = serializers.CharField(max_length=200)
     email = serializers.CharField(max_length=200)
     avatar = serializers.URLField()
     bio = serializers.CharField(max_length=600)
@@ -29,11 +41,15 @@ class CustomUserDetailSerializer(CustomUserSerializer):
         def update(self, instance, validated_data):
             instance.username = validated_data.get('username',instance.username)
             # instance.full_name = validated_data.get('full name',instance.full_name)
+            instance.email = validated_data.get('email',instance.email)
             instance.avatar = validated_data.get('avatar', instance.avatar)
             instance.bio = validated_data.get('bio', instance.bio)
             instance.website = validated_data.get('website', instance.website)
             instance.save()
             return instance
+
+# /* --------------------------------------------------------- */
+# /* --------------------------------------------------------- */
 
 # CREATE A USER ACCOUNT
 class RegisterSerializer(serializers.ModelSerializer):

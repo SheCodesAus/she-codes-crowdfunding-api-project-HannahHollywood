@@ -29,9 +29,8 @@ class PledgeDetailSerializer(PledgeSerializer):
             instance.save()
             return instance
 
-# --------------------------------------
-# -----------------------------------------------------------------------------------------
-# --------------------------------------
+# /* --------------------------------------------------------- */
+# /* --------------------------------------------------------- */
 
 # Project Creation & Views
 class ProjectSerializer(serializers.Serializer):
@@ -54,7 +53,7 @@ class ProjectSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Project.objects.create(**validated_data)
 
-# --------------------------------------
+# /* --------------------------------------------------------- */
 
 # Comment Section Views
 class CommentSerializer(serializers.ModelSerializer):
@@ -79,7 +78,7 @@ class ProjectCommentSerializer(serializers.ModelSerializer):
         # fields = []
         exclude = ["visible", "project"]  
 
-# --------------------------------------
+# /* --------------------------------------------------------- */
 
 class ProjectDetailSerializer(ProjectSerializer):
         pledges = PledgeSerializer(many=True, read_only=True)
@@ -98,9 +97,8 @@ class ProjectDetailSerializer(ProjectSerializer):
             instance.save()
             return instance
 
-# --------------------------------------
-# -----------------------------------------------------------------------------------------
-# --------------------------------------
+# /* --------------------------------------------------------- */
+# /* --------------------------------------------------------- */
 
 class CategorySerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -109,3 +107,10 @@ class CategorySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Category.objects.create(**validated_data)
+
+class CategoryDetailSerializer(CategorySerializer):
+        def update(self, instance, validated_data):
+            instance.name = validated_data.get('name', instance.name)
+            instance.slug = validated_data.get('slug', instance.slug)
+            instance.save()
+            return instance
