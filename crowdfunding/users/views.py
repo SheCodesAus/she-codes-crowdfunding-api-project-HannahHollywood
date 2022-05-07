@@ -13,7 +13,7 @@ class CustomUserList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
+        serializer = CustomUserSerializer(data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -60,10 +60,23 @@ class CustomUserDetail(APIView):
 # /* --------------------------------------------------------- */
 
 # "Creating user account view" == Register Account
-class RegisterView(generics.CreateAPIView):
-    serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny,]
-    queryset = CustomUser.objects.all()
+# class RegisterView(APIView):
+#     # serializer_class = RegisterSerializer
+#     permission_classes = [permissions.AllowAny,]
+#     # queryset = CustomUser.objects.all()
+
+#     def post(self, request):
+#         serializer = RegisterSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(
+#                 serializer.data,
+#                 status=status.HTTP_201_CREATED
+#             )
+#         return Response(
+#             serializer.errors,
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
 
 # /* --------------------------------------------------------- */
 # /* --------------------------------------------------------- */

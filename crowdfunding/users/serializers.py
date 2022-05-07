@@ -53,6 +53,7 @@ class CustomUserDetailSerializer(CustomUserSerializer):
 
 # CREATE A USER ACCOUNT
 class RegisterSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
     email = serializers.EmailField(
             required=True,
             validators=[UniqueValidator(queryset=CustomUser.objects.all())]

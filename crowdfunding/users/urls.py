@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     path('', views.CustomUserList.as_view()),
     path('<int:pk>/', views.CustomUserDetail.as_view()),
-    path('register/', views.RegisterView.as_view()),
+    # path('register/', views.RegisterView.as_view()),
     path('badges/', views.BadgeView.as_view(), name="badge-list"),
     path('badges/<int:pk>', views.BadgeDetailView.as_view(), name="badge-type"),
 ]
