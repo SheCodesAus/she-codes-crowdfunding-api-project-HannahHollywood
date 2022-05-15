@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from .models import CustomUser, Badge
-from .serializers import BadgeSerializer, BadgeDetailSerializer, CustomUserSerializer, RegisterSerializer, CustomUserDetailSerializer
+from .serializers import BadgeSerializer, BadgeDetailSerializer, CustomUserSerializer, CustomUserDetailSerializer
 
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -18,7 +18,10 @@ class CustomObtainAuthToken(ObtainAuthToken):
 
 
 # View a list of ALL user profiles on the website
-class CustomUserList(APIView):
+class CustomUserList(ObtainAuthToken):
+    permission_classes = [permissions.AllowAny,]
+    queryset = CustomUser.objects.all()
+
     def get(self, request):
         users = CustomUser.objects.all()
         serializer = CustomUserSerializer(users, many=True)
@@ -28,7 +31,12 @@ class CustomUserList(APIView):
         serializer = CustomUserSerializer(data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            user = serializer.data['id']
+            token, created = Token.objects.get_or_create(user_id=user)
+            return Response({
+                'token': token.key,
+                'data': serializer.data
+            })
         return Response(serializer.errors)
 
 
